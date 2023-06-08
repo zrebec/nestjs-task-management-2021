@@ -8,7 +8,7 @@ import { Task } from './task.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export default class TasksService {
+export class TasksService {
   constructor(private readonly tasksRepository: TasksRepository) {}
   // async getAllTasks(): Promise<Task[]> {
   //   return this.tasks;
