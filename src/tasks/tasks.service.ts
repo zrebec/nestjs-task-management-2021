@@ -1,40 +1,37 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { TaskStatus } from './task-status.enum';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { TasksRepository } from './tasks.repository';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './task.entity';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class TasksService {
   constructor(private readonly tasksRepository: TasksRepository) {}
-  // async getAllTasks(): Promise<Task[]> {
-  //   return this.tasks;
-  // }
-  // async getTasksWithFilters(filterDto: GetTasksFilterDto): Promise<Task[]> {
-  //   const { status, search } = filterDto;
-  //   // define a temporary array to hold the result
-  //   let tasks = await this.getAllTasks();
-  //   // do something with status
-  //   if (status) {
-  //     tasks = tasks.filter((task) => task.status === status);
-  //   }
-  //   // dome something with search
-  //   if (search) {
-  //     tasks = tasks.filter((task) => {
-  //       if (
-  //         task.title.toLowerCase().includes(search.toLocaleLowerCase()) ||
-  //         task.description.toLowerCase().includes(search.toLocaleLowerCase())
-  //       ) {
-  //         return true;
-  //       }
-  //       return false;
-  //     });
-  //   }
-  //   return tasks;
-  // }
+  async getAllTasks(): Promise<Task[]> {
+    return this.tasksRepository.getAllTasks();
+  }
+  async getTasksWithFilters(filterDto: GetTasksFilterDto): Promise<Task[]> {
+    const { status, search } = filterDto;
+    // define a temporary array to hold the result
+    let tasks = await this.getAllTasks();
+    // do something with status
+    if (status) {
+      tasks = tasks.filter((task) => task.status === status);
+    }
+    // dome something with search
+    if (search) {
+      tasks = tasks.filter((task) => {
+        if (
+          task.title.toLowerCase().includes(search.toLocaleLowerCase()) ||
+          task.description.toLowerCase().includes(search.toLocaleLowerCase())
+        ) {
+          return true;
+        }
+        return false;
+      });
+    }
+    return tasks;
+  }
   // deleteTask({ id }: { id: string }): void {
   //   // This should be refactor because this is not effective
   //   // We're trying task with ID which we want to delete by
@@ -48,7 +45,7 @@ export class TasksService {
   // }
 
   async getTaskById(id: string): Promise<Task> {
-    const found = await this.tasksRepository.findOne({ where: { id: id } });
+    const found = await this.tasksRepository.findOneBy({ id });
 
     if (!found) {
       throw new NotFoundException(`Task with ID "${id}" was not found`);
