@@ -42,8 +42,8 @@ export class TasksController {
   // In Delete() the parameters are usualy gived as params in url
   @Delete('/:id')
   deleteTask(@Param('id') id: string): Promise<void> {
-    return this.tasksService.deleteTask(id);
-    //return this.tasksService.deleteTaskById(id);
+    //return this.tasksService.deleteTask(id);
+    return this.tasksService.deleteTaskById(id);
   }
 
   // @Patch('/:id/status')
