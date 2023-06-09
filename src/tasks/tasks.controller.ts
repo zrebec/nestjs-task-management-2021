@@ -41,7 +41,7 @@ export class TasksController {
   // Delete() method usualy doesn't contain a @Body() which wanted to use
   // In Delete() the parameters are usualy gived as params in url
   @Delete('/:id')
-  deleteTask(@Param('id') id: string): Promise<void> {
+  deleteTask(@Param('id') id: string): Promise<{}> {
     //return this.tasksService.deleteTask(id);
     return this.tasksService.deleteTaskById(id);
   }
