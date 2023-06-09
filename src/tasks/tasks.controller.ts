@@ -5,8 +5,8 @@ import {
   Param,
   Post,
   Delete,
-  Patch,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -18,16 +18,10 @@ import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
-  // @Get()
-  // getTasks(@Query() filterDto: GetTasksFilterDto): Promise<Task[]> {
-  //   // if we have any filters define, call tasksService.getTasksWithFilters
-  //   // otherwise, just get all tasks
-  //   if (Object.keys(filterDto).length) {
-  //     return this.tasksService.getTasksWithFilters(filterDto);
-  //   } else {
-  //     return this.tasksService.getAllTasks();
-  //   }
-  // }
+  @Get()
+  getTasks(@Query() filterDto: GetTasksFilterDto): Promise<Task[]> {
+    return this.tasksService.getTasks(filterDto);
+  }
 
   @Get('/:id')
   getTaskById(@Param('id') id: string): Promise<Task> {
@@ -42,7 +36,7 @@ export class TasksController {
   // Delete() method usualy doesn't contain a @Body() which wanted to use
   // In Delete() the parameters are usualy gived as params in url
   @Delete('/:id')
-  deleteTask(@Param('id') id: string): Promise<{}> {
+  deleteTask(@Param('id') id: string): Promise<object> {
     //return this.tasksService.deleteTask(id);
     return this.tasksService.deleteTaskById(id);
   }
@@ -50,8 +44,8 @@ export class TasksController {
   @Patch('/:id/status')
   updateTaskStatus(
     @Param('id') id: string,
-    @Body() updateTaskStatusDto: UpdateTaskStatusDto,
+    @Body() updateTaskStatusDto: UpdateTaskStatusDto
   ): Promise<Task> {
-    return this.tasksService.updateTaskStatus(id, updateTaskStatusDto.status)
+    return this.tasksService.updateTaskStatus(id, updateTaskStatusDto.status);
   }
 }
