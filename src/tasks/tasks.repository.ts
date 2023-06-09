@@ -3,12 +3,14 @@ import { Task } from './task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskStatus } from './task-status.enum';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 
 @Injectable()
 export class TasksRepository extends Repository<Task> {
   constructor(private dataSource: DataSource) {
     super(Task, dataSource.createEntityManager());
   }
+
   async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
     const task = this.create({
       title: createTaskDto.title,
@@ -20,8 +22,23 @@ export class TasksRepository extends Repository<Task> {
     return task;
   }
 
-  async getAllTasks(): Promise<Task[]> {
-    return this.find();
+  async getTasks(filterDto: GetTasksFilterDto): Promise<Task[]> {
+    const query = this.createQueryBuilder('task');
+    const { status, search } = filterDto;
+
+    if (status) {
+      query.andWhere('task.status = :status', { status });
+    }
+
+    if (search) {
+      query.andWhere(
+        '( LOWER(task.title) LIKE LOWER(:search) OR LOWER(task.description) LIKE LOWER(:search) )',
+        { search: `%${search}%` }
+      );
+    }
+
+    const tasks = await query.getMany();
+    return tasks;
   }
 
   async updateTaskStatus(id: string, status: TaskStatus): Promise<Task> {
@@ -35,7 +52,7 @@ export class TasksRepository extends Repository<Task> {
   // so it is important to pass it a concrete object that
   // we want to remove. In this case, it is an object of the Task type
   // which we found in tasks.service.ts
-  async deleteTask(task: Task): Promise<{}> {
+  async deleteTask(task: Task): Promise<object> {
     return await this.remove(task);
   }
 
@@ -48,7 +65,7 @@ export class TasksRepository extends Repository<Task> {
     return found;
   }
 
-  async deleteTaskById(id: string): Promise<{}> {
+  async deleteTaskById(id: string): Promise<object> {
     // The delete method deletes a record by id, field id or where conditions
     // which are then sold as an object. Thus, the delete method can be
     // delete(1) - removes a specific id
