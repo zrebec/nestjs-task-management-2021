@@ -24,6 +24,13 @@ export class TasksRepository extends Repository<Task> {
     return this.find();
   }
 
+  async updateTaskStatus(id: string, status: TaskStatus): Promise<Task> {
+    const task = await this.getTaskById(id);
+    task.status = status;
+    await this.save(task);
+    return task;
+  }
+
   // The remove method removes the concrete object,
   // so it is important to pass it a concrete object that
   // we want to remove. In this case, it is an object of the Task type
