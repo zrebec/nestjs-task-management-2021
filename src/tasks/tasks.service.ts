@@ -7,9 +7,11 @@ import { Task } from './task.entity';
 @Injectable()
 export class TasksService {
   constructor(private readonly tasksRepository: TasksRepository) {}
+
   async getAllTasks(): Promise<Task[]> {
     return this.tasksRepository.getAllTasks();
   }
+
   async getTasksWithFilters(filterDto: GetTasksFilterDto): Promise<Task[]> {
     const { status, search } = filterDto;
     // define a temporary array to hold the result
@@ -32,17 +34,19 @@ export class TasksService {
     }
     return tasks;
   }
-  // deleteTask({ id }: { id: string }): void {
-  //   // This should be refactor because this is not effective
-  //   // We're trying task with ID which we want to delete by
-  //   // using existng mehtong getTaskById which interates every
-  //   // array to find task and then we're looping whole array
-  //   // again because we want get the error which returns
-  //   // getTaskById if task doesn't not exists. Hopefully later
-  //   // we will find better solution
-  //   const found = this.getTaskById(id);
-  //   this.tasks = this.tasks.filter((task) => task.id !== found.id);
-  // }
+
+  // Delete task by object which we cound in getTaskById
+  async deleteTask(id: string): Promise<void> {
+    const foundTask = await this.getTaskById(id);
+    this.tasksRepository.deleteTask(foundTask);
+  }
+
+  // Delete task by id parameter (look deleteTaskById in repository for
+  // better description)
+  async deleteTaskById(id: string): Promise<void> {
+    const foundTask = await this.getTaskById(id);
+    this.tasksRepository.deleteTaskById(foundTask.id);
+  }
 
   async getTaskById(id: string): Promise<Task> {
     const found = await this.tasksRepository.findOneBy({ id });
@@ -53,23 +57,7 @@ export class TasksService {
     return found;
   }
 
-  async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
-    return await this.tasksRepository.createTask(createTaskDto);
+  createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+    return this.tasksRepository.createTask(createTaskDto);
   }
-
-  // async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
-  //   const task: Task = {
-  //     id: uuid(),
-  //     title: createTaskDto.title,
-  //     description: createTaskDto.description,
-  //     status: TaskStatus.OPEN,
-  //   };
-  //   this.tasks.push(task);
-  //   return task;
-  // }
-  // async updateTaskStatus(id: string, status: TaskStatus): Promise<Task> {
-  //   const task = this.getTaskById(id);
-  //   task.status = status;
-  //   return task;
-  // }
 }
