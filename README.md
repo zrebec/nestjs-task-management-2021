@@ -61,6 +61,7 @@ $ npm run test:cov
 ## TODO
 
 [ ] Try move entity files into entity folder. All entity files in one folder
+[ ] Try create and config ormconfig.ts file for postgres configuration instead has it in forRoot in app.module.ts (hint: look at the YT history video or to my learning watchlist in YT)
 
 ## Support
 
