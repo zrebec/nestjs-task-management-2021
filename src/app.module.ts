@@ -16,6 +16,7 @@ import { AuthModule } from './auth/auth.module';
       password: 'postgress',
       database: 'task-management',
       autoLoadEntities: true,
+      // synchronize to true is good for development but not for production
       synchronize: true,
     }),
     AuthModule,
