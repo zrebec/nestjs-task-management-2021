@@ -7,14 +7,14 @@ import { Injectable } from '@nestjs/common';
 export class AuthService {
   constructor (
     @InjectRepository(UsersRepository)
-    private readonly usersRepository: UsersRepository
+    private readonly usersRepository: UsersRepository,
   ) {}
 
   async signUp(authCredetialsDto: AuthCredentialsDto): Promise<void> {
-      await this.usersRepository.createUser(authCredetialsDto);
+      await this.usersRepository.signUp(authCredetialsDto);
   }
 
-  async signIn(authCredetialsDto: AuthCredentialsDto): Promise<string> {
-    return await this.usersRepository.loginUser(authCredetialsDto);
+  async signIn(authCredetialsDto: AuthCredentialsDto): Promise<{ accessToken: string }> {
+    return await this.usersRepository.signIn(authCredetialsDto);
   }
 }
