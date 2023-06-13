@@ -1,5 +1,9 @@
-import { BeforeInsert, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { 
+  BeforeInsert, Column, CreateDateColumn, Entity, 
+  OneToMany, PrimaryGeneratedColumn, UpdateDateColumn 
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Task } from 'src/tasks/task.entity';
 
 @Entity()
 export class User {
@@ -17,6 +21,11 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  // eager is something like lazy. In this case, OneToMany means
+  // that all tasks will be read after user login
+  @OneToMany(_type => Task, task => task.user, { eager: true })
+  tasks: Task[];
 
   // Database triggers
   @BeforeInsert()
