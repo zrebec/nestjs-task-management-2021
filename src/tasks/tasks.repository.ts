@@ -1,4 +1,4 @@
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Equal, Repository } from 'typeorm';
 import { Task } from './task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskStatus } from './task-status.enum';
@@ -47,8 +47,8 @@ export class TasksRepository extends Repository<Task> {
     return tasks;
   }
 
-  async updateTaskStatus(id: string, status: TaskStatus): Promise<Task> {
-    const task = await this.getTaskById(id);
+  async updateTaskStatus(id: string, status: TaskStatus, user: User): Promise<Task> {
+    const task = await this.getTaskById(id, user);
     task.status = status;
     await this.save(task);
     return task;
@@ -62,8 +62,13 @@ export class TasksRepository extends Repository<Task> {
     return await this.remove(task);
   }
 
-  async getTaskById(id: string): Promise<Task> {
-    const found = await this.findOneBy({ id });
+  async getTaskById(id: string, user: User): Promise<Task> {
+    const found = await this.findOneBy(
+      {
+        id,
+        user: Equal(user.id)
+      }
+    );
 
     if (!found) {
       throw new NotFoundException(`Task with ID "${id}" was not found`);
@@ -71,13 +76,18 @@ export class TasksRepository extends Repository<Task> {
     return found;
   }
 
-  async deleteTaskById(id: string): Promise<object> {
+  async deleteTaskById(id: string, user: User): Promise<object> {
     // The delete method deletes a record by id, field id or where conditions
     // which are then sold as an object. Thus, the delete method can be
     // delete(1) - removes a specific id
     // delete([1, 2, 3]) - delete id 1, 2 and 3
     // delete({name: 'Thomas'}) - delete records where name is equal to Thomas
-    const result = await this.delete(id);
+    const result = await this.delete(
+       {
+        id,
+        user: Equal(user.id)
+      }
+    );
     if (result.affected === 0) {
       throw new NotFoundException(`Task with ID "${id}" was not found`);
     }

@@ -29,8 +29,8 @@ export class TasksController {
   }
 
   @Get('/:id')
-  getTaskById(@Param('id') id: string): Promise<Task> {
-    return this.tasksService.getTaskById(id);
+  getTaskById(@Param('id') id: string, @GetUser() user: User): Promise<Task> {
+    return this.tasksService.getTaskById(id, user);
   }
 
   @Post()
@@ -41,16 +41,17 @@ export class TasksController {
   // Delete() method usualy doesn't contain a @Body() which wanted to use
   // In Delete() the parameters are usualy gived as params in url
   @Delete('/:id')
-  deleteTask(@Param('id') id: string): Promise<object> {
+  deleteTask(@Param('id') id: string, @GetUser() user: User): Promise<object> {
     //return this.tasksService.deleteTask(id);
-    return this.tasksService.deleteTaskById(id);
+    return this.tasksService.deleteTaskById(id, user);
   }
 
   @Patch('/:id/status')
   updateTaskStatus(
     @Param('id') id: string,
-    @Body() updateTaskStatusDto: UpdateTaskStatusDto
+    @Body() updateTaskStatusDto: UpdateTaskStatusDto,
+    @GetUser() user: User,
   ): Promise<Task> {
-    return this.tasksService.updateTaskStatus(id, updateTaskStatusDto.status);
+    return this.tasksService.updateTaskStatus(id, updateTaskStatusDto.status, user);
   }
 }

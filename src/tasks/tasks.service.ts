@@ -15,26 +15,26 @@ export class TasksService {
   }
 
   // Delete task by object which we cound in getTaskById
-  async deleteTask(id: string): Promise<object> {
-    const foundTask = await this.getTaskById(id);
+  async deleteTask(id: string, user: User): Promise<object> {
+    const foundTask = await this.getTaskById(id, user);
     return this.tasksRepository.deleteTask(foundTask);
   }
 
   // Delete task by id parameter (look deleteTaskById in repository for
   // better description)
-  deleteTaskById(id: string): Promise<object> {
-    return this.tasksRepository.deleteTaskById(id);
+  deleteTaskById(id: string, user: User): Promise<object> {
+    return this.tasksRepository.deleteTaskById(id, user);
   }
 
-  async getTaskById(id: string): Promise<Task> {
-    return this.tasksRepository.getTaskById(id);
+  async getTaskById(id: string, user: User): Promise<Task> {
+    return this.tasksRepository.getTaskById(id, user);
   }
 
   createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
     return this.tasksRepository.createTask(createTaskDto, user);
   }
 
-  async updateTaskStatus(id: string, status: TaskStatus): Promise<Task> {
-    return this.tasksRepository.updateTaskStatus(id, status);
+  async updateTaskStatus(id: string, status: TaskStatus, user: User): Promise<Task> {
+    return this.tasksRepository.updateTaskStatus(id, status, user);
   }
 }
