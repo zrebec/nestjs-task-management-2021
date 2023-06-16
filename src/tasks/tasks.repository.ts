@@ -2,12 +2,15 @@ import { DataSource, Equal, Repository } from 'typeorm';
 import { Task } from './task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskStatus } from './task-status.enum';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { User } from 'src/auth/user.entity';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class TasksRepository extends Repository<Task> {
+  // Create logger with context TasksRepository and with timestamp
+  private logger = new Logger('TasksRepostitory', {timestamp: true});
   constructor(private dataSource: DataSource) {
     super(Task, dataSource.createEntityManager());
   }
@@ -20,7 +23,12 @@ export class TasksRepository extends Repository<Task> {
       user,
     });
 
-    await this.save(task);
+    try {
+      await this.save(task);
+      this.logger.verbose('Task is sucesfully created');
+    } catch (error) {
+      this.logger.error(`Task is not created. Reason: ${error}`);
+    }
     return task;
   }
 
@@ -43,8 +51,15 @@ export class TasksRepository extends Repository<Task> {
       );
     }
 
-    const tasks = await query.getMany();
-    return tasks;
+    try {
+      const tasks = await query.getMany();
+      return tasks;
+    } catch (error) {
+      this.logger.error(`
+        Failed to get tasks for user "${user.username}". Filters: ${JSON.stringify(filterDto)}. Reason: ${error}
+        `, error.stack);      
+      throw new InternalServerErrorException();
+    }
   }
 
   async updateTaskStatus(id: string, status: TaskStatus, user: User): Promise<Task> {
@@ -63,12 +78,7 @@ export class TasksRepository extends Repository<Task> {
   }
 
   async getTaskById(id: string, user: User): Promise<Task> {
-    const found = await this.findOneBy(
-      {
-        id,
-        user: Equal(user.id)
-      }
-    );
+    const found = await this.findOneBy( { id, user: Equal(user.id) } );
 
     if (!found) {
       throw new NotFoundException(`Task with ID "${id}" was not found`);

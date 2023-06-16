@@ -2,8 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { TransformInterceptor } from './tasks/tranform.interceptor';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
+  const logger = new Logger();
   const app = await NestFactory.create(AppModule);
 
   // Using global validation pipes for DTO's
@@ -22,6 +24,8 @@ async function bootstrap() {
   // Using interceptor for hide senstitive informations. More in
   // transform.interceptor file
   app.useGlobalInterceptors(new TransformInterceptor());
-  await app.listen(3000);
+  const port = 3000;
+  await app.listen(port);
+  logger.log(`Application listening on port ${port}`);
 }
 bootstrap();
